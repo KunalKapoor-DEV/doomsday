@@ -1,0 +1,394 @@
+import { useState } from "react";
+
+const phases = [
+  {
+    id: "p1",
+    label: "Phase 1",
+    subtitle: "The Infinity Saga begins",
+    years: "2008–2012",
+    color: "#c0392b",
+    entries: [
+      { title: "Captain America: The First Avenger", type: "MOVIE", year: "1943–45", importance: "essential", note: "Sets up the Tesseract, Steve Rogers, HYDRA. The MCU's actual chronological start." },
+      { title: "Captain Marvel", type: "MOVIE", year: "1995", importance: "essential", note: "Introduces Carol Danvers, the Skrulls, and young Nick Fury. Crucial for Endgame." },
+      { title: "Iron Man", type: "MOVIE", year: "2008", importance: "essential", note: "Where it ALL begins. Tony Stark = the soul of the MCU." },
+      { title: "The Incredible Hulk", type: "MOVIE", year: "2008", importance: "optional", note: "Different actor for Hulk. General Ross (Red Hulk later) matters. Safely skippable." },
+      { title: "Iron Man 2", type: "MOVIE", year: "2010", importance: "recommended", note: "Introduces Black Widow and War Machine. Seeds for The Avengers." },
+      { title: "Thor", type: "MOVIE", year: "2011", importance: "essential", note: "Introduces Thor, Loki, Asgard, and the Bifrost. Loki is the Phase 1 villain." },
+      { title: "The Avengers", type: "MOVIE", year: "2012", importance: "essential", note: "The team assembles for the first time. Battle of New York. Thanos teased." },
+    ]
+  },
+  {
+    id: "p2",
+    label: "Phase 2",
+    subtitle: "Expanding the universe",
+    years: "2013–2015",
+    color: "#e67e22",
+    entries: [
+      { title: "Iron Man 3", type: "MOVIE", year: "2013", importance: "recommended", note: "Tony's PTSD after New York. Mandarin twist. Pepper's arc matters." },
+      { title: "Thor: The Dark World", type: "MOVIE", year: "2013", importance: "optional", note: "Introduces the Reality Stone (Aether). Weakest MCU film but stone matters." },
+      { title: "Captain America: The Winter Soldier", type: "MOVIE", year: "2014", importance: "essential", note: "HYDRA inside SHIELD. Bucky as Winter Soldier. One of the best MCU films." },
+      { title: "Guardians of the Galaxy", type: "MOVIE", year: "2014", importance: "essential", note: "Introduces cosmic MCU — Star-Lord, Gamora, Rocket, Groot, Drax. Power Stone introduced." },
+      { title: "Guardians of the Galaxy Vol. 2", type: "MOVIE", year: "2014", importance: "essential", note: "Ego the Living Planet. Yondu's arc. Backstory on Peter Quill's origin." },
+      { title: "Avengers: Age of Ultron", type: "MOVIE", year: "2015", importance: "essential", note: "Vision born, Scarlet Witch introduced, Mind Stone revealed. Sets up Civil War." },
+      { title: "Ant-Man", type: "MOVIE", year: "2015", importance: "recommended", note: "Scott Lang as Ant-Man. Quantum Realm first introduced — key for later." },
+    ]
+  },
+  {
+    id: "p3",
+    label: "Phase 3",
+    subtitle: "The Infinity Saga climax",
+    years: "2016–2019",
+    color: "#8e44ad",
+    entries: [
+      { title: "Captain America: Civil War", type: "MOVIE", year: "2016", importance: "essential", note: "Avengers split. Spider-Man & Black Panther debut. Bucky frozen. Tony vs Steve." },
+      { title: "Black Widow", type: "MOVIE", year: "2016", importance: "recommended", note: "Set after Civil War. Yelena Belova introduced. Red Guardian. Fills Natasha's past." },
+      { title: "Doctor Strange", type: "MOVIE", year: "2016", importance: "essential", note: "Introduces the Multiverse, Time Stone, and the Sorcerer Supreme. Critical for Doomsday." },
+      { title: "Spider-Man: Homecoming", type: "MOVIE", year: "2017", importance: "essential", note: "Peter Parker joins the MCU. Tony mentors him. Vulture is great." },
+      { title: "Thor: Ragnarok", type: "MOVIE", year: "2017", importance: "essential", note: "Asgard destroyed. Hela. Hulk arena fight. Valkyrie. Taika Waititi's best." },
+      { title: "Black Panther", type: "MOVIE", year: "2018", importance: "essential", note: "Wakanda, T'Challa, Killmonger, vibranium. Wakanda becomes globally crucial." },
+      { title: "Avengers: Infinity War", type: "MOVIE", year: "2018", importance: "essential", note: "Thanos collects all 6 stones. The Snap. Half the universe gone. Do NOT skip." },
+      { title: "Ant-Man and the Wasp", type: "MOVIE", year: "2018", importance: "essential", note: "Quantum Realm deep dive. Janet Van Dyne rescued. Scott gets stuck inside — leads to Endgame's time travel." },
+      { title: "Avengers: Endgame", type: "MOVIE", year: "2023", importance: "essential", note: "The culmination of 22 films. Time heist. Tony's sacrifice. Steve's ending. THE event." },
+      { title: "Spider-Man: Far From Home", type: "MOVIE", year: "2024", importance: "essential", note: "Post-Endgame world. Mysterio. Nick Fury Skrull. Spider-Man's identity exposed. Sets up No Way Home." },
+    ]
+  },
+  {
+    id: "p4",
+    label: "Phase 4",
+    subtitle: "The Multiverse Saga opens",
+    years: "2021–2022",
+    color: "#16a085",
+    entries: [
+      { title: "WandaVision", type: "SHOW", year: "2023", importance: "essential", note: "Wanda creates a reality from grief. Scarlet Witch born. Vision's fate. Essential multiverse context." },
+      { title: "The Falcon and the Winter Soldier", type: "SHOW", year: "2024", importance: "essential", note: "Sam Wilson becomes Captain America. Bucky's arc. Sets up Brave New World." },
+      { title: "Loki (Season 1)", type: "SHOW", year: "2024", importance: "essential", note: "TVA, Sacred Timeline, branching timelines. He Who Remains (Kang variant) dies — unleashes the multiverse. CRITICAL for Doomsday." },
+      { title: "Black Widow", type: "MOVIE", year: "2021", importance: "recommended", note: "Already listed under Phase 3 chronologically." },
+      { title: "Shang-Chi and the Legend of the Ten Rings", type: "MOVIE", year: "2024", importance: "recommended", note: "Shang-Chi, the Ten Rings, Ta Lo. New hero incoming for Doomsday." },
+      { title: "What If...? (Season 1)", type: "SHOW", year: "2024", importance: "optional", note: "Alternate universe stories. Fun but not required. Watch if you have time." },
+      { title: "Eternals", type: "MOVIE", year: "2024", importance: "optional", note: "Ancient cosmic beings. Celestials. Slow burn. Characters appear in future films." },
+      { title: "Hawkeye", type: "SHOW", year: "2025", importance: "recommended", note: "Kate Bishop introduced. Yelena hunts Clint. Kingpin tease. Sets up Echo & Daredevil." },
+      { title: "Spider-Man: No Way Home", type: "MOVIE", year: "2025", importance: "essential", note: "Multiverse cracks open. Three Spider-Men. Doctor Strange screws up. Peter's identity reset. Game changer." },
+      { title: "Doctor Strange in the Multiverse of Madness", type: "MOVIE", year: "2025", importance: "essential", note: "Scarlet Witch goes full villain. America Chavez. Illuminati. Directly feeds Doomsday's multiverse setup." },
+      { title: "Ms. Marvel", type: "SHOW", year: "2025", importance: "recommended", note: "Kamala Khan's origin. Powers via bangle. Sets up The Marvels." },
+      { title: "Thor: Love and Thunder", type: "MOVIE", year: "2025", importance: "optional", note: "Gorr the God Butcher. Jane as Mighty Thor. Fun but light on plot consequences." },
+      { title: "She-Hulk: Attorney at Law", type: "SHOW", year: "2025", importance: "optional", note: "Fourth-wall breaking comedy. Skaar (Hulk's son) teased. Easy skip." },
+      { title: "Black Panther: Wakanda Forever", type: "MOVIE", year: "2025", importance: "essential", note: "Shuri takes the mantle. Namor and Talokan introduced. Ironheart's MCU debut." },
+      { title: "Guardians of the Galaxy Holiday Special", type: "SHOW", year: "2025", importance: "optional", note: "Fun short special. Mantis reveal. Not plot-critical." },
+    ]
+  },
+  {
+    id: "p5",
+    label: "Phase 5",
+    subtitle: "The Multiverse expands",
+    years: "2023–2025",
+    color: "#2980b9",
+    entries: [
+      { title: "Ant-Man and the Wasp: Quantumania", type: "MOVIE", year: "2025", importance: "essential", note: "Kang the Conqueror as main villain. Council of Kangs post-credits. Now pivoted to Doctor Doom/Doomsday." },
+      { title: "Secret Invasion", type: "SHOW", year: "2025", importance: "recommended", note: "Skrulls infiltrate Earth. Gravik. President Ritson's anti-Skrull laws. Sets up Brave New World." },
+      { title: "Loki (Season 2)", type: "SHOW", year: "2025", importance: "essential", note: "Loki becomes God of Stories, holds the multiverse branches together. Kang saga conclusion. CRITICAL." },
+      { title: "Guardians of the Galaxy Vol. 3", type: "MOVIE", year: "2025", importance: "essential", note: "Rocket's origin revealed. High Evolutionary. Emotional farewell to the original team." },
+      { title: "Echo", type: "SHOW", year: "2025", importance: "optional", note: "Maya Lopez's story. Kingpin becomes powerful. Watch for Daredevil: Born Again setup." },
+      { title: "The Marvels", type: "MOVIE", year: "2025", importance: "recommended", note: "Carol, Monica, Kamala swap places. Monica enters another universe — seeds the Fantastic Four." },
+      { title: "Agatha All Along", type: "SHOW", year: "2025", importance: "recommended", note: "Agatha Harkness, the Witches Road. Joe Locke as Billy Maximoff. Wanda's sons return." },
+      { title: "Daredevil: Born Again (Season 1)", type: "SHOW", year: "2025", importance: "recommended", note: "Matt Murdock, Kingpin as NYC Mayor. Street-level MCU. Sets up Daredevil's Doomsday role." },
+      { title: "What If...? (Season 2 & 3)", type: "SHOW", year: "2025", importance: "optional", note: "More alternate universe tales. Season 3 wraps the series. Fun bonus content." },
+      { title: "Deadpool & Wolverine", type: "MOVIE", year: "2025", importance: "essential", note: "Deadpool and Wolverine enter the main MCU. TVA. Cassandra Nova. Void. Multiverse lore expands. RDJ tease." },
+      { title: "Captain America: Brave New World", type: "MOVIE", year: "2025", importance: "essential", note: "Sam Wilson as Cap faces Red Hulk (Thunderbolt Ross). Leader returns. Adamantium introduced. Sets up Thunderbolts*." },
+      { title: "Thunderbolts*", type: "MOVIE", year: "2025", importance: "essential", note: "The dark Avengers team. Sentry introduced. Directly connects to Doomsday — Bob Reynolds' Void could be key." },
+      { title: "Ironheart", type: "SHOW", year: "2025", importance: "recommended", note: "Riri Williams builds her suit. Hood/Parker Robbins. Parker Robbins connected to Doom lore." },
+      { title: "Wonder Man", type: "SHOW", year: "2025", importance: "optional", note: "Simon Williams as celebrity superhero. Scarlet Witch connection. Newest Disney+ show." },
+    ]
+  },
+  {
+    id: "p6",
+    label: "Phase 6",
+    subtitle: "The road to Doomsday",
+    years: "2025–2026",
+    color: "#d4af37",
+    entries: [
+      { title: "The Fantastic Four: First Steps", type: "MOVIE", year: "2025", importance: "essential", note: "Reed Richards, Sue Storm, Johnny Storm, Ben Grimm debut in a retro-futuristic alternate universe. Doctor Doom's world. DIRECTLY feeds Doomsday." },
+      { title: "Spider-Man: Brand New Day", type: "MOVIE", year: "2026", importance: "essential", note: "Peter Parker returns after No Way Home memory wipe. Teams up with Hulk & Daredevil. Drops July 31, 2026 — watch before Doomsday." },
+      { title: "⚡ AVENGERS: DOOMSDAY", type: "MOVIE", year: "Dec 18, 2026", importance: "target", note: "Robert Downey Jr. returns as Doctor Doom. The Russo brothers return to direct. The multiverse collides. This is what we're building toward." },
+    ]
+  }
+];
+
+const importanceMeta = {
+  essential: { label: "ESSENTIAL", color: "#e74c3c", bg: "rgba(231,76,60,0.15)", icon: "⚡" },
+  recommended: { label: "WATCH", color: "#f39c12", bg: "rgba(243,156,18,0.12)", icon: "★" },
+  optional: { label: "OPTIONAL", color: "#7f8c8d", bg: "rgba(127,140,141,0.1)", icon: "◦" },
+  target: { label: "TARGET", color: "#d4af37", bg: "rgba(212,175,55,0.2)", icon: "🎯" },
+};
+
+export default function MCUTracker() {
+  const [activePhase, setActivePhase] = useState("p1");
+  const [filter, setFilter] = useState("all");
+  const [checked, setChecked] = useState({});
+
+  const phase = phases.find(p => p.id === activePhase);
+  const filtered = phase.entries.filter(e =>
+    filter === "all" ? true : e.importance === filter
+  );
+
+  const toggleCheck = (key) => setChecked(prev => ({ ...prev, [key]: !prev[key] }));
+
+  const totalEssential = phases.flatMap(p => p.entries).filter(e => e.importance === "essential" || e.importance === "target").length;
+  const checkedCount = Object.values(checked).filter(Boolean).length;
+
+  return (
+    <div style={{
+      background: "#080a0f",
+      minHeight: "100vh",
+      fontFamily: "'Georgia', 'Times New Roman', serif",
+      color: "#e8e0d0",
+      padding: "0",
+      position: "relative",
+      overflow: "hidden"
+    }}>
+      {/* Noise overlay */}
+      <div style={{
+        position: "fixed", inset: 0, opacity: 0.03,
+        backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E\")",
+        pointerEvents: "none", zIndex: 0
+      }} />
+
+      {/* Header */}
+      <div style={{
+        background: "linear-gradient(180deg, #0d0508 0%, #080a0f 100%)",
+        borderBottom: "1px solid rgba(212,175,55,0.2)",
+        padding: "32px 24px 20px",
+        textAlign: "center",
+        position: "relative"
+      }}>
+        <div style={{ fontSize: "11px", letterSpacing: "6px", color: "#d4af37", marginBottom: "8px", fontFamily: "sans-serif", fontWeight: "300" }}>
+          MARVEL CINEMATIC UNIVERSE
+        </div>
+        <h1 style={{
+          fontSize: "clamp(22px, 5vw, 38px)",
+          fontWeight: "900",
+          margin: "0 0 4px",
+          background: "linear-gradient(135deg, #e8e0d0 30%, #d4af37 100%)",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+          letterSpacing: "1px",
+          lineHeight: 1.1
+        }}>
+          ROAD TO DOOMSDAY
+        </h1>
+        <div style={{ fontSize: "13px", color: "#7f8c8d", fontFamily: "sans-serif", marginTop: "6px" }}>
+          Complete Watch Order · Dec 18, 2026
+        </div>
+
+        {/* Progress bar */}
+        <div style={{ marginTop: "16px", maxWidth: "400px", margin: "16px auto 0" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
+            <span style={{ fontSize: "11px", fontFamily: "sans-serif", color: "#7f8c8d" }}>PROGRESS</span>
+            <span style={{ fontSize: "11px", fontFamily: "sans-serif", color: "#d4af37" }}>{checkedCount} watched</span>
+          </div>
+          <div style={{ height: "3px", background: "rgba(255,255,255,0.07)", borderRadius: "2px", overflow: "hidden" }}>
+            <div style={{
+              height: "100%",
+              width: `${Math.min(100, (checkedCount / totalEssential) * 100)}%`,
+              background: "linear-gradient(90deg, #c0392b, #d4af37)",
+              borderRadius: "2px",
+              transition: "width 0.4s ease"
+            }} />
+          </div>
+        </div>
+      </div>
+
+      {/* Phase tabs */}
+      <div style={{
+        display: "flex",
+        overflowX: "auto",
+        padding: "0 12px",
+        background: "#0a0c12",
+        borderBottom: "1px solid rgba(255,255,255,0.06)",
+        scrollbarWidth: "none",
+        gap: "2px"
+      }}>
+        {phases.map(p => (
+          <button key={p.id} onClick={() => setActivePhase(p.id)} style={{
+            flexShrink: 0,
+            padding: "14px 16px 12px",
+            background: "none",
+            border: "none",
+            borderBottom: activePhase === p.id ? `2px solid ${p.color}` : "2px solid transparent",
+            color: activePhase === p.id ? "#e8e0d0" : "#4a5568",
+            cursor: "pointer",
+            fontSize: "11px",
+            fontFamily: "sans-serif",
+            fontWeight: "700",
+            letterSpacing: "1.5px",
+            transition: "all 0.2s",
+            whiteSpace: "nowrap"
+          }}>
+            {p.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Phase header */}
+      <div style={{
+        padding: "20px 20px 12px",
+        borderBottom: "1px solid rgba(255,255,255,0.05)",
+        background: `linear-gradient(135deg, rgba(${
+          phase.color === "#c0392b" ? "192,57,43" :
+          phase.color === "#e67e22" ? "230,126,34" :
+          phase.color === "#8e44ad" ? "142,68,173" :
+          phase.color === "#16a085" ? "22,160,133" :
+          phase.color === "#2980b9" ? "41,128,185" : "212,175,55"
+        },0.08) 0%, transparent 100%)`
+      }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "12px" }}>
+          <div>
+            <h2 style={{ margin: 0, fontSize: "20px", fontWeight: "700", color: phase.color }}>{phase.label}</h2>
+            <div style={{ fontSize: "13px", color: "#7f8c8d", fontFamily: "sans-serif", marginTop: "2px" }}>
+              {phase.subtitle} · {phase.years}
+            </div>
+          </div>
+          {/* Filter buttons */}
+          <div style={{ display: "flex", gap: "6px" }}>
+            {["all", "essential", "recommended", "optional"].map(f => (
+              <button key={f} onClick={() => setFilter(f)} style={{
+                padding: "5px 10px",
+                borderRadius: "4px",
+                border: filter === f ? `1px solid ${importanceMeta[f]?.color || "#d4af37"}` : "1px solid rgba(255,255,255,0.08)",
+                background: filter === f ? (importanceMeta[f]?.bg || "rgba(212,175,55,0.15)") : "transparent",
+                color: filter === f ? (importanceMeta[f]?.color || "#d4af37") : "#4a5568",
+                fontSize: "10px",
+                fontFamily: "sans-serif",
+                fontWeight: "700",
+                letterSpacing: "0.5px",
+                cursor: "pointer",
+                transition: "all 0.2s"
+              }}>
+                {f.toUpperCase()}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Entries */}
+      <div style={{ padding: "12px 16px 40px", display: "flex", flexDirection: "column", gap: "6px" }}>
+        {filtered.map((entry, i) => {
+          const meta = importanceMeta[entry.importance];
+          const key = `${activePhase}-${i}`;
+          const done = checked[key];
+          return (
+            <div
+              key={key}
+              onClick={() => toggleCheck(key)}
+              style={{
+                background: done ? "rgba(255,255,255,0.02)" : meta.bg,
+                border: `1px solid ${done ? "rgba(255,255,255,0.05)" : meta.color + "30"}`,
+                borderLeft: `3px solid ${done ? "rgba(255,255,255,0.15)" : meta.color}`,
+                borderRadius: "6px",
+                padding: "14px 16px",
+                cursor: "pointer",
+                transition: "all 0.2s",
+                opacity: done ? 0.45 : 1,
+                userSelect: "none"
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
+                {/* Checkmark */}
+                <div style={{
+                  width: "20px",
+                  height: "20px",
+                  flexShrink: 0,
+                  border: `1.5px solid ${done ? meta.color : "rgba(255,255,255,0.2)"}`,
+                  borderRadius: "3px",
+                  background: done ? meta.color : "transparent",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginTop: "1px",
+                  transition: "all 0.2s",
+                  fontSize: "12px"
+                }}>
+                  {done && "✓"}
+                </div>
+
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                    <span style={{
+                      fontSize: "15px",
+                      fontWeight: "700",
+                      color: entry.importance === "target" ? "#d4af37" : "#e8e0d0",
+                      lineHeight: 1.3
+                    }}>
+                      {entry.title}
+                    </span>
+                    <span style={{
+                      fontSize: "9px",
+                      fontFamily: "sans-serif",
+                      fontWeight: "700",
+                      letterSpacing: "1px",
+                      padding: "2px 6px",
+                      borderRadius: "3px",
+                      background: entry.type === "MOVIE" ? "rgba(255,255,255,0.06)" : "rgba(22,160,133,0.15)",
+                      color: entry.type === "MOVIE" ? "#a0aec0" : "#16a085",
+                      border: entry.type === "SHOW" ? "1px solid rgba(22,160,133,0.3)" : "1px solid rgba(255,255,255,0.08)"
+                    }}>
+                      {entry.type}
+                    </span>
+                    <span style={{
+                      fontSize: "9px",
+                      fontFamily: "sans-serif",
+                      fontWeight: "700",
+                      letterSpacing: "1px",
+                      padding: "2px 6px",
+                      borderRadius: "3px",
+                      background: meta.bg,
+                      color: meta.color,
+                      border: `1px solid ${meta.color}40`
+                    }}>
+                      {meta.icon} {meta.label}
+                    </span>
+                    <span style={{ fontSize: "11px", fontFamily: "sans-serif", color: "#4a5568" }}>
+                      {entry.year}
+                    </span>
+                  </div>
+                  <p style={{
+                    margin: "6px 0 0",
+                    fontSize: "13px",
+                    fontFamily: "sans-serif",
+                    color: "#718096",
+                    lineHeight: "1.5"
+                  }}>
+                    {entry.note}
+                  </p>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Legend footer */}
+      <div style={{
+        position: "sticky",
+        bottom: 0,
+        background: "rgba(8,10,15,0.95)",
+        borderTop: "1px solid rgba(255,255,255,0.06)",
+        padding: "10px 16px",
+        display: "flex",
+        gap: "16px",
+        flexWrap: "wrap",
+        backdropFilter: "blur(8px)"
+      }}>
+        {Object.entries(importanceMeta).filter(([k]) => k !== "target").map(([k, v]) => (
+          <div key={k} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <span style={{ color: v.color, fontSize: "12px" }}>{v.icon}</span>
+            <span style={{ fontSize: "10px", fontFamily: "sans-serif", color: "#4a5568", letterSpacing: "0.5px" }}>{v.label}</span>
+          </div>
+        ))}
+        <div style={{ marginLeft: "auto", fontSize: "10px", fontFamily: "sans-serif", color: "#4a5568" }}>
+          Tap any entry to mark as watched
+        </div>
+      </div>
+    </div>
+  );
+}
